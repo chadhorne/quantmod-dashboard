@@ -35,7 +35,7 @@ ui <- dashboardPage(
       tabItem(tabName = "dashboard",
         
         fluidRow(
-          box(title = "Stock Data", width = 8,
+          box(title = "Stock Data", width = 12,
               
               plotOutput("stockPlot")
               )
@@ -54,15 +54,22 @@ server <- function(input, output) {
     # Depends on getData button
     input$getData
     
-    getSymbols(isolate(input$symbol), src = "yahoo", from = isolate(input$startDate), auto.assign = FALSE)
+    # Pull an extra year of data for analysis
+    getSymbols(isolate(input$symbol), from = isolate(input$startDate - years(1)),
+               auto.assign = FALSE)
   })
   
   # Plot stock data
   output$stockPlot <- renderPlot({
     
-    chartSeries(stockData())
+    # getData button dependency
+    input$getData
     
-    addSMA(n = 50)
+    # Create date limit string for charting
+    dateLimit <- paste0(isolate(input$startDate), "::", Sys.Date())
+    
+    # Chart data with analysis
+    chartSeries(stockData(), subset = dateLimit, TA = c(addVo(), addBBands()))
   })
 }
 
