@@ -1,5 +1,4 @@
 # Required packages
-require(shiny)
 require(shinydashboard)
 require(quantmod)
 require(lubridate)
@@ -35,10 +34,14 @@ ui <- dashboardPage(
       tabItem(tabName = "dashboard",
         
         fluidRow(
-          box(title = "Stock Data", width = 12,
+          box(title = "Stock Data", width = 8, status = "primary",
               
               plotOutput("stockPlot")
-              )
+              ),
+          
+          box(title = "Log Differences", width = 4, status = "primary",
+              
+              plotOutput("logDiffPlot"))
           )
         )
       )
@@ -70,6 +73,21 @@ server <- function(input, output) {
     
     # Chart data with analysis
     chartSeries(stockData(), subset = dateLimit, TA = c(addVo(), addBBands()))
+  })
+  
+  output$logDiffPlot <- renderPlot({
+    
+    # getData button dependency
+    input$getData
+    
+    # Create date limit string
+    dateLimit <- paste0(isolate(input$startDate), "::", Sys.Date())
+    
+    # Compute log differences
+    stockDiff <- stockData() %>% log %>% diff
+    
+    # Plot Close column log differences
+    plot(stockDiff[, 4])
   })
 }
 
