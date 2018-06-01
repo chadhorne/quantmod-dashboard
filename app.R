@@ -34,7 +34,8 @@ ui <- dashboardPage(
       tabItem(tabName = "dashboard",
         
         fluidRow(
-          box(title = "Stock Data", width = 8, status = "primary",
+          box(title = textOutput("symbol"),
+              width = 8, status = "primary",
               
               plotOutput("stockPlot")
               ),
@@ -50,6 +51,14 @@ ui <- dashboardPage(
 
 # Server--------------------------------------
 server <- function(input, output) {
+  
+  # Input symbol
+  output$symbol <- renderText({
+    
+    input$getData
+    
+    toupper(isolate(input$symbol))
+  })
   
   # Get stock data
   stockData <- reactive({
@@ -80,14 +89,12 @@ server <- function(input, output) {
     # getData button dependency
     input$getData
     
-    # Create date limit string
-    dateLimit <- paste0(isolate(input$startDate), "::", Sys.Date())
-    
     # Compute log differences
     stockDiff <- stockData() %>% log %>% diff
     
-    # Plot Close column log differences
-    plot(stockDiff[, 4])
+    # Plot Close column's log differences
+    plot(stockDiff[index(stockDiff) >= isolate(input$startDate), 4],
+         main = "Log Differences")
   })
 }
 
