@@ -2,6 +2,7 @@
 require(shinydashboard)
 require(quantmod)
 require(lubridate)
+require(dplyr)
 
 
 ui <- dashboardPage(
@@ -60,7 +61,7 @@ server <- function(input, output) {
     toupper(isolate(input$symbol))
   })
   
-  # Get stock data
+  # Get stock data------------------
   stockData <- reactive({
     
     # Depends on getData button
@@ -70,6 +71,8 @@ server <- function(input, output) {
     getSymbols(isolate(input$symbol), from = isolate(input$startDate - years(1)),
                auto.assign = FALSE)
   })
+  
+  # Stock plot output-------------
   
   # Plot stock data
   output$stockPlot <- renderPlot({
@@ -84,6 +87,7 @@ server <- function(input, output) {
     chartSeries(stockData(), subset = dateLimit, TA = c(addVo(), addBBands()))
   })
   
+  # Log differences output--------------
   output$logDiffPlot <- renderPlot({
     
     # getData button dependency
@@ -94,7 +98,7 @@ server <- function(input, output) {
     
     # Plot Close column's log differences
     plot(stockDiff[index(stockDiff) >= isolate(input$startDate), 4],
-         main = "Log Differences")
+         main = "", lwd = 1.5)
   })
 }
 

@@ -5,4 +5,4 @@ Quantmod Dashboard
 Overview
 --------
 
-If you're wanting to jump into some financial data analysis without having to learn to code, this dashboard application is for you. This Quantmod Dashboard is a GUI for the popular `quantmod` R package used for analyzing stocks and financial data.
+This is a dashboard application I've been experimenting with for the `quantmod` R package used for analyzing stock prices and other financial data. I'm still working on adding new tools and features to it.
